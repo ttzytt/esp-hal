@@ -862,6 +862,51 @@ mod ll {
     pub(super) fn write(mask: u32, value: u32) {
         unsafe { core::arch::asm!("ee.wr_mask_gpio_out {0}, {1}", in(reg) mask, in(reg) value) }
     }
+
+    
+    #[inline(always)]
+    pub fn fast_set_high<const BITS: u8>() {
+        unsafe {
+            core::arch::asm!(
+                "ee.set_bit_gpio_out {mask}",
+                mask = const BITS,
+            );
+        }
+    }   
+
+    macro_rules! fast_set_high {
+        ($bits:expr) => {
+            const {assert!($bits < 0xFF);};
+            unsafe {
+                core::arch::asm!(
+                    "ee.set_bit_gpio_out {mask}",
+                    mask = const $bits,
+                );
+            }
+        };
+    }
+
+    #[inline(always)]
+    pub fn fast_set_low<const BITS: u8>() {
+        unsafe {
+            core::arch::asm!(
+                "ee.clr_bit_gpio_out {mask}",
+                mask = const BITS,
+            );
+        }
+    }
+
+    macro_rules! fast_set_low{
+        ($bits:expr) => {
+            const {assert!($bits < 0xFF);};
+            unsafe {
+                core::arch::asm!(
+                    "ee.clr_bit_gpio_out {mask}",
+                    mask = const $bits,
+                );
+            }
+        };
+    }
 }
 
 #[cfg(riscv)]
